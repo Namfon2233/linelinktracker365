@@ -18,14 +18,20 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   <div class="max-w-6xl mx-auto">
     <h1 class="text-3xl font-bold mb-6">📊 Group Dashboard</h1>
 
-  <!-- 🎯 Group Selector -->
-<div class="mb-6">
-  <label for="groupSelector" class="block text-sm font-medium mb-1">Filter by Group</label>
-  <select id="groupSelector" class="border rounded p-2">
-    <option value="">🔽 All Groups</option>
-    <!-- ตัวเลือกจะถูกโหลดอัตโนมัติ -->
-  </select>
+  <<!-- 🎯 Group Selector พร้อมปุ่ม Export CSV -->
+<div class="mb-6 flex items-end">
+  <div class="flex-1">
+    <label for="groupSelector" class="block text-sm font-medium mb-1">Filter by Group</label>
+    <select id="groupSelector" class="border rounded p-2 w-full">
+      <option value="">🔽 All Groups</option>
+      <!-- ตัวเลือกจะถูกโหลดอัตโนมัติ -->
+    </select>
+  </div>
+  <button id="exportCsvBtn" class="bg-blue-500 text-white py-2 px-4 rounded ml-2">
+    📥 Export CSV
+  </button>
 </div>
+
 
 
     <!-- 📈 Chart Type Selector -->
