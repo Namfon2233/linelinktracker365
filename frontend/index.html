@@ -1,1 +1,96 @@
-<!-- Dashboard UI -->
+<!-- frontend/group.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Group Dashboard | LINE Link Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Leaflet CSS -->
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">📊 Group Dashboard</h1>
+
+  <!-- 🎯 Group Selector -->
+<div class="mb-6">
+  <label for="groupSelector" class="block text-sm font-medium mb-1">Filter by Group</label>
+  <select id="groupSelector" class="border rounded p-2">
+    <option value="">🔽 All Groups</option>
+    <!-- ตัวเลือกจะถูกโหลดอัตโนมัติ -->
+  </select>
+</div>
+
+
+    <!-- 📈 Chart Type Selector -->
+    <div class="mb-6">
+      <label for="chartMode" class="block text-sm font-medium mb-1">Chart Type</label>
+      <select id="chartMode" class="border rounded p-2">
+        <option value="timeline">Click Timeline</option>
+        <option value="perDay">Clicks per Day</option>
+      </select>
+    </div>
+
+    <!-- 📊 Group Click Table -->
+    <section class="mb-10">
+      <h2 class="text-xl font-bold mb-3">📊 ยอดคลิกแยกตามกลุ่ม</h2>
+      <table class="w-full bg-white shadow rounded overflow-hidden">
+        <thead class="bg-gray-100 text-left">
+          <tr>
+            <th class="py-2 px-4">#</th>
+            <th class="py-2 px-4">Group</th>
+            <th class="py-2 px-4 text-center">Total Clicks</th>
+          </tr>
+        </thead>
+        <tbody id="groupTableBody"></tbody>
+      </table>
+    </section>
+
+    <!-- 📈 Chart Section -->
+    <div class="mb-10" id="chartSection">
+      <h2 class="text-xl font-semibold mb-2">📈 Click Statistics</h2>
+      <canvas id="clickChart" height="100"></canvas>
+    </div>
+
+    <!-- 🗺️ Map Section -->
+    <div id="mapSection" class="mb-10 ">
+      <h2 class="text-xl font-semibold mb-2">🗺️ Click Locations</h2>
+      <div id="map" class="w-full h-96 bg-gray-200 rounded shadow"></div>
+    </div>
+
+    <!-- 📁 Export Button -->
+    <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded mb-4">
+      📁 Export Logs (CSV)
+    </button>
+
+    <!-- 🧮 Clicks by URL -->
+    <div id="clickTableContainer" class="mb-10 hidden">
+      <h2 class="text-xl font-semibold mb-2">🧮 Clicks by URL</h2>
+      <table class="min-w-full border bg-white rounded shadow-md">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="border p-2 text-left">#</th>
+            <th class="border p-2 text-left">URL</th>
+            <th class="border p-2 text-left">Total Clicks</th>
+          </tr>
+        </thead>
+        <tbody id="clickTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="group.js"></script>
+  <script type="module" src="components/group.js"></script>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</body>
+</html>
