@@ -3,12 +3,13 @@ const fs = require("fs");
 const path = require("path");
 const router = express.Router();
 
-const GROUPS_PATH = path.resolve(__dirname, '../data/groups.json');
+const GROUPS_PATH = path.resolve(__dirname, '../../data/groups.json');
+const LOGS_PATH = path.resolve(__dirname, '../../data/logs.json');
+const STATE_PATH = path.resolve(__dirname, '../../data/state.json');
+
 console.log("📁 GROUPS_PATH = ", GROUPS_PATH);
-console.log("📦 File exists? = ", fs.existsSync(GROUPS_PATH));
+console.log('📦 File exists? = ', fs.existsSync(GROUPS_PATH));
 console.log("📄 File content = ", fs.readFileSync(GROUPS_PATH, "utf8"));
-const LOGS_PATH = path.resolve(__dirname, '../data/logs.json');
-const STATE_PATH = path.resolve(__dirname, '../data/state.json');
 
 // 🔁 โหลด group
 function loadGroups() {
