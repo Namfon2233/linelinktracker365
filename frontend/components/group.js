@@ -1,4 +1,3 @@
-// frontend/components/group.js
 import { renderClickChart } from './StatsChart.js';
 
 let logs = [];
@@ -72,7 +71,7 @@ async function exportCsv() {
   }
 }
 
-// รันเมื่อโหลดหน้าเว็บ
+// ✅ รันเมื่อโหลดหน้าเว็บ
 document.addEventListener('DOMContentLoaded', async () => {
   await fetchLogs();                     // โหลด logs แล้วเก็บไว้ใน global
   populateGroupSelector(logs);          // ใส่ options ลง dropdown
@@ -80,9 +79,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupChartModeSelector();             // dropdown ประเภทกราฟ
   renderClickChart(logs, 'timeline');   // กราฟ
   renderMap(logs);                      // แผนที่
+
+  // ✅ ย้ายมาไว้ใน DOMContentLoaded เพื่อไม่ให้ error
+  document.getElementById('groupSelector').addEventListener('change', () => {
+    const group = document.getElementById('groupSelector').value;
+    const filteredLogs = filterLogsByGroup(logs, group);
+
+    renderClickChart(filteredLogs, document.getElementById('chartMode').value);
+    renderMap(filteredLogs);
+    renderGroupTable(filteredLogs);
+  });
+
   document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
 });
-
 
 function renderMap(logs) {
   const mapContainer = document.getElementById('map');
@@ -124,18 +133,7 @@ function populateGroupSelector(logs) {
   });
 }
 
-// ✅ ฟังก์ชันกรอง logs ตามกลุ่ม
 function filterLogsByGroup(logs, group) {
   if (!group) return logs;
   return logs.filter(log => log.group === group);
 }
-
-// ✅ เพิ่ม Event Listener เมื่อเลือกกลุ่ม
-document.getElementById('groupSelector').addEventListener('change', () => {
-  const group = document.getElementById('groupSelector').value;
-  const filteredLogs = filterLogsByGroup(logs, group);
-
-  renderClickChart(filteredLogs, document.getElementById('chartMode').value);
-  renderMap(filteredLogs);
-  renderGroupTable(filteredLogs);
-});
