@@ -38,4 +38,9 @@ async function fetchLogs() {
 
   import { renderClickChart } from './components/StatsChart.js';
 
-  
+  fetch('/api/logs')
+  .then(res => res.json())
+  .then(logs => {
+    renderClickChart(logs); // แสดงกราฟ
+    // ใส่โค้ดอื่น เช่น renderTable(logs) ด้วยได้
+  });
