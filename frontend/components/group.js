@@ -35,4 +35,7 @@ async function fetchLogs() {
   }
   
   document.addEventListener('DOMContentLoaded', renderGroupTable);
+
+  import { renderClickChart } from './components/StatsChart.js';
+
   
