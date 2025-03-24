@@ -12,11 +12,10 @@ async function fetchLogs() {
 }
 
 // แสดงตารางคลิกแยกตามกลุ่ม
-async function renderGroupTable() {
-  const logs = await fetchLogs();
+function renderGroupTable(filteredLogs = logs) {
   const groupClicks = {};
 
-  logs.forEach(log => {
+  filteredLogs.forEach(log => {
     const group = log.group || 'unknown';
     groupClicks[group] = (groupClicks[group] || 0) + 1;
   });
@@ -75,8 +74,68 @@ async function exportCsv() {
 
 // รันเมื่อโหลดหน้าเว็บ
 document.addEventListener('DOMContentLoaded', async () => {
-  await renderGroupTable();
-  setupChartModeSelector();
-  renderClickChart(logs, 'timeline'); // เริ่มต้นด้วย timeline
+  await fetchLogs();                     // โหลด logs แล้วเก็บไว้ใน global
+  populateGroupSelector(logs);          // ใส่ options ลง dropdown
+  renderGroupTable();                   // ตารางกลุ่ม
+  setupChartModeSelector();             // dropdown ประเภทกราฟ
+  renderClickChart(logs, 'timeline');   // กราฟ
+  renderMap(logs);                      // แผนที่
   document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
+});
+
+
+function renderMap(logs) {
+  const mapContainer = document.getElementById('map');
+  mapContainer.innerHTML = ''; // เคลียร์แผนที่เก่า (ถ้ามี)
+
+  // ✅ สร้างแผนที่
+  const map = L.map('map').setView([13.736717, 100.523186], 6); // Thailand center
+
+  // ✅ โหลดแผนที่จาก OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // ✅ วนลูป logs และวาง marker
+  logs.forEach(log => {
+    const lat = parseFloat(log.latitude || log.lat);
+    const lon = parseFloat(log.longitude || log.lon);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+      const marker = L.marker([lat, lon]).addTo(map);
+      marker.bindPopup(`
+        <strong>Group:</strong> ${log.group || 'unknown'}<br>
+        <strong>IP:</strong> ${log.ip || '-'}
+      `);
+    }
+  });
+}
+
+function populateGroupSelector(logs) {
+  const groupSelector = document.getElementById('groupSelector');
+  const groups = new Set(logs.map(log => log.group || 'unknown'));
+
+  groupSelector.innerHTML = `<option value="">🔽 All Groups</option>`;
+  groups.forEach(group => {
+    const option = document.createElement('option');
+    option.value = group;
+    option.textContent = group;
+    groupSelector.appendChild(option);
+  });
+}
+
+// ✅ ฟังก์ชันกรอง logs ตามกลุ่ม
+function filterLogsByGroup(logs, group) {
+  if (!group) return logs;
+  return logs.filter(log => log.group === group);
+}
+
+// ✅ เพิ่ม Event Listener เมื่อเลือกกลุ่ม
+document.getElementById('groupSelector').addEventListener('change', () => {
+  const group = document.getElementById('groupSelector').value;
+  const filteredLogs = filterLogsByGroup(logs, group);
+
+  renderClickChart(filteredLogs, document.getElementById('chartMode').value);
+  renderMap(filteredLogs);
+  renderGroupTable(filteredLogs);
 });
