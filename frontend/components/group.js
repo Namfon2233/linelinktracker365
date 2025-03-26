@@ -9,17 +9,29 @@ function jsonToCsv(jsonData) {
   return [header, ...rows].join('\r\n');
 }
 
-// ✅ [เพิ่ม] ฟังก์ชัน export logs เฉพาะกลุ่มที่เลือก
+// ✅ [เพิ่ม] ฟังก์ชัน export logs เฉพาะกลุ่ม + วันที่ที่เลือก
 async function exportGroupLogs() {
   const selectedGroup = document.getElementById('groupSelector').value;
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+
+  if (!startDate || !endDate) {
+    alert("⛔ กรุณาเลือกวันที่เริ่มต้นและสิ้นสุด");
+    return;
+  }
 
   const response = await fetch('/api/logs');
-  const logs = await response.json();
+  const allLogs = await response.json();
 
-  const filteredLogs = logs.filter(log => log.group === selectedGroup);
+  const filteredLogs = allLogs.filter(log => {
+    const groupMatch = !selectedGroup || log.group === selectedGroup;
+    const logDate = new Date(log.timestamp).toISOString().split("T")[0];
+    const dateMatch = logDate >= startDate && logDate <= endDate;
+    return groupMatch && dateMatch;
+  });
 
   if (filteredLogs.length === 0) {
-    alert("ไม่มีข้อมูลสำหรับกลุ่มนี้");
+    alert("ไม่มีข้อมูลในช่วงเวลาที่เลือก");
     return;
   }
 
@@ -28,7 +40,7 @@ async function exportGroupLogs() {
   const url = URL.createObjectURL(blob);
   const downloadLink = document.createElement('a');
   downloadLink.href = url;
-  downloadLink.download = `${selectedGroup}-logs.csv`;
+  downloadLink.download = `${selectedGroup || 'all'}-logs-${startDate}_to_${endDate}.csv`;
 
   document.body.appendChild(downloadLink);
   downloadLink.click();
@@ -113,10 +125,33 @@ function filterLogsByGroup(logs, group) {
   return logs.filter(log => log.group === group);
 }
 
+// ✅ [เพิ่ม] ฟังก์ชันแสดง Date Picker
+function renderDateFilters() {
+  const dateControls = document.getElementById('dateFilterControls');
+  if (!dateControls) return;
+
+  dateControls.innerHTML = `
+    <div class="flex gap-4 mb-4">
+      <div>
+        <label class="block text-sm font-medium">📅 Start Date</label>
+        <input type="date" id="startDate" class="border rounded px-2 py-1" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium">📅 End Date</label>
+        <input type="date" id="endDate" class="border rounded px-2 py-1" />
+      </div>
+      <button id="exportCsvBtn" class="bg-blue-600 text-white px-4 py-2 rounded mt-6 hover:bg-blue-700">
+        Export Logs
+      </button>
+    </div>
+  `;
+}
+
 // ✅ รันเมื่อโหลดหน้าเว็บ
 document.addEventListener('DOMContentLoaded', async () => {
   await fetchLogs();
   populateGroupSelector(logs);
+  renderDateFilters(); // ✅ เรียกฟังก์ชันแสดง Date Picker
   renderGroupTable();
   setupChartModeSelector();
   renderClickChart(logs, 'timeline');
@@ -130,6 +165,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderGroupTable(filteredLogs);
   });
 
-  // ✅ [เพิ่ม] เชื่อมปุ่ม Export CSV กับฟังก์ชันใหม่
-  document.getElementById('exportCsvBtn').addEventListener('click', exportGroupLogs);
+  // ✅ เชื่อมปุ่ม Export CSV กับฟังก์ชันใหม่
+  document.addEventListener('click', e => {
+    if (e.target.id === 'exportCsvBtn') {
+      exportGroupLogs();
+    }
+  });
 });
