@@ -184,3 +184,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+// 🌙 Dark Mode Toggle (ล่าสุด)
+document.addEventListener('DOMContentLoaded', () => {
+  const darkToggle = document.getElementById('dark-mode-toggle');
+  const htmlElement = document.documentElement;
+
+  // ดึงค่า Dark Mode จาก localStorage
+  if (localStorage.getItem('dark-mode') === 'true') {
+    htmlElement.classList.add('dark');
+    if(darkToggle) darkToggle.checked = true;
+  }
+
+  // ป้องกัน Error หากไม่มีปุ่ม Dark Mode
+  if(darkToggle) {
+    darkToggle.addEventListener('change', () => {
+      htmlElement.classList.toggle('dark', darkToggle.checked);
+      localStorage.setItem('dark-mode', darkToggle.checked);
+    });
+  }
+});

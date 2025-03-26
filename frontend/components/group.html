@@ -1,4 +1,3 @@
-<!-- frontend/components/group.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,17 +9,28 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
-<body class="bg-gray-50 text-gray-800 p-6">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6">
   <div class="max-w-6xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6">📊 Group Dashboard</h1>
+    
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">📊 Group Dashboard</h1>
+
+      <!-- 🌙 ปุ่ม Dark Mode Toggle -->
+      <label class="inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
+        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600 transition-colors duration-300">
+          <span class="absolute top-1 left-1 bg-white w-4 h-4 rounded-full shadow transform peer-checked:translate-x-full peer-checked:bg-gray-300 transition-transform duration-300"></span>
+        </div>
+        <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Dark Mode</span>
+      </label>
+    </div>
 
     <!-- 🎯 Group Selector + Export CSV -->
     <div class="mb-6 flex items-end">
       <div class="flex-1">
         <label for="groupSelector" class="block text-sm font-medium mb-1">Filter by Group</label>
-        <select id="groupSelector" class="border rounded p-2 w-full">
+        <select id="groupSelector" class="border rounded p-2 w-full bg-white dark:bg-gray-800">
           <option value="">🔽 All Groups</option>
-          <!-- ตัวเลือกจะถูกเติมโดย JS -->
         </select>
       </div>
       <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded ml-2">
@@ -31,7 +41,7 @@
     <!-- 📈 Chart Type Selector -->
     <div class="mb-6">
       <label for="chartMode" class="block text-sm font-medium mb-1">Chart Type</label>
-      <select id="chartMode" class="border rounded p-2">
+      <select id="chartMode" class="border rounded p-2 bg-white dark:bg-gray-800">
         <option value="timeline">Click Timeline</option>
         <option value="perDay">Clicks per Day</option>
       </select>
@@ -40,8 +50,8 @@
     <!-- 📊 Group Click Table -->
     <section class="mb-10">
       <h2 class="text-xl font-bold mb-3">📊 ยอดคลิกแยกตามกลุ่ม</h2>
-      <table class="w-full bg-white shadow rounded overflow-hidden">
-        <thead class="bg-gray-100 text-left">
+      <table class="w-full bg-white dark:bg-gray-800 shadow rounded overflow-hidden">
+        <thead class="bg-gray-100 dark:bg-gray-700 text-left">
           <tr>
             <th class="py-2 px-4">#</th>
             <th class="py-2 px-4">Group</th>
@@ -61,14 +71,14 @@
     <!-- 🗺️ Map Section -->
     <div id="mapSection" class="mb-10">
       <h2 class="text-xl font-semibold mb-2">🗺️ Click Locations</h2>
-      <div id="map" class="w-full h-96 bg-gray-200 rounded shadow"></div>
+      <div id="map" class="w-full h-96 bg-gray-200 dark:bg-gray-800 rounded shadow"></div>
     </div>
 
     <!-- 🧮 Clicks by URL -->
     <div id="clickTableContainer" class="mb-10 hidden">
       <h2 class="text-xl font-semibold mb-2">🧮 Clicks by URL</h2>
-      <table class="min-w-full border bg-white rounded shadow-md">
-        <thead class="bg-gray-100">
+      <table class="min-w-full border bg-white dark:bg-gray-800 rounded shadow-md">
+        <thead class="bg-gray-100 dark:bg-gray-700">
           <tr>
             <th class="border p-2 text-left">#</th>
             <th class="border p-2 text-left">URL</th>
