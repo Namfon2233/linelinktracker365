@@ -1,1 +1,26 @@
 /* Responsive Design */
+/* 🌍 Custom Leaflet Popup Styling */
+.leaflet-popup-content-wrapper.custom-popup {
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px;
+  }
+  
+  .leaflet-popup-tip {
+    background: #fff;
+  }
+  
+  /* 🌙 Dark Mode Styling for Popup */
+  .dark .leaflet-popup-content-wrapper.custom-popup {
+    background: #1e293b; /* slate-800 */
+    color: white;
+    box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+  }
+  
+  .dark .leaflet-popup-tip {
+    background: #1e293b;
+  }
+  
