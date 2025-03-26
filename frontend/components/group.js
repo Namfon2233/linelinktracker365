@@ -85,6 +85,7 @@ function setupChartModeSelector() {
   });
 }
 
+// ✅ [อัปเดต] เพิ่ม Tooltip บนแผนที่
 function renderMap(logs) {
   const mapContainer = document.getElementById('map');
   mapContainer.innerHTML = '';
@@ -99,10 +100,21 @@ function renderMap(logs) {
     const lon = parseFloat(log.longitude || log.lon);
     if (!isNaN(lat) && !isNaN(lon)) {
       const marker = L.marker([lat, lon]).addTo(map);
-      marker.bindPopup(`
-        <strong>Group:</strong> ${log.group || 'unknown'}<br>
-        <strong>IP:</strong> ${log.ip || '-'}
-      `);
+
+      const popupContent = `
+        <div class="text-sm leading-snug">
+          <div><strong>👥 กลุ่ม:</strong> ${log.group || 'unknown'}</div>
+          <div><strong>🌐 IP:</strong> ${log.ip || '-'}</div>
+          <div><strong>📍 พิกัด:</strong> ${log.city || '-'}, ${log.country || '-'}</div>
+          <div><strong>🕒 เวลา:</strong> ${new Date(log.timestamp).toLocaleString()}</div>
+          <div><strong>📱 อุปกรณ์:</strong> ${log.device?.device || '-'} (${log.device?.os || '-'})</div>
+          <div><strong>🔎 เบราว์เซอร์:</strong> ${log.device?.browser || '-'}</div>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent, {
+        className: 'custom-popup'
+      });
     }
   });
 }
