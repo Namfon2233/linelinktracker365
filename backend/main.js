@@ -9,18 +9,17 @@ const logRoutes = require('./routes/logRoutes'); // ✅ เพิ่ม logRoute
 const confirmRoute = require('./routes/confirm'); // ✅ เพิ่มตรงนี้
 const exportLogsRoute = require('./routes/exportLogs'); // ✅ เพิ่มตรงนี้
 
-
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../frontend')));
+
+// ✅ [แก้ไขตรงนี้] เสิร์ฟ frontend ที่เส้นทาง /frontend
+app.use('/frontend', express.static(path.join(__dirname, '../frontend')));
 
 app.use('/api/links', linkRoutes);
-app.use('/api/logs', logRoutes); // ✅ เพิ่ม Endpoint /api/logs
-app.use('/api/confirm', confirmRoute); // ✅ ใช้งาน API confirm
-app.use('/api/export-logs', exportLogsRoute); // ✅ เพิ่มตรงนี้
-app.use('/', groupRoutes); // ✅ ใช้งาน groupRoutes
+app.use('/api/logs', logRoutes);
+app.use('/api/confirm', confirmRoute);
+app.use('/api/export-logs', exportLogsRoute);
+app.use('/', groupRoutes);
 
 app.get('/', (req, res) => {
   res.send('✅ API is running from backend/main.js');
