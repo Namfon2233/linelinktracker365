@@ -5,16 +5,37 @@
   <meta charset="UTF-8" />
   <title>LINE Link Tracker Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 p-6">
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold mb-6">📋 LINE Link Tracker Dashboard</h1>
 
-    <!-- ✅ ปุ่ม Export Logs เป็น CSV -->
+    <!-- ✅ กรองตามกลุ่ม + วันที่ -->
     <div class="mb-6">
-      <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-        📤 Export Logs เป็น CSV
-      </button>
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div>
+          <label for="groupSelector" class="block text-sm font-medium">🧩 เลือกกลุ่ม</label>
+          <select id="groupSelector" class="border px-3 py-1 rounded w-full">
+            <option value="">🔽 All Groups</option>
+            <!-- group options จะแสดงที่นี่ -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">📅 Start Date</label>
+          <input type="date" id="startDate" class="border rounded px-3 py-1" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">📅 End Date</label>
+          <input type="date" id="endDate" class="border rounded px-3 py-1" />
+        </div>
+        <div class="flex items-end">
+          <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+            📤 Export Logs เป็น CSV
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- ✅ ส่วนแสดงลิงก์ทั้งหมด -->
@@ -23,6 +44,42 @@
       <div id="linkList" class="grid gap-4">
         <!-- ลิงก์จะแสดงที่นี่ -->
       </div>
+    </section>
+
+    <!-- ✅ ตารางคลิกตามกลุ่ม -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold mb-4">📊 จำนวนคลิกแยกตามกลุ่ม</h2>
+      <table class="w-full table-auto border">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="px-4 py-2 text-left">#</th>
+            <th class="px-4 py-2 text-left">Group</th>
+            <th class="px-4 py-2 text-center">Clicks</th>
+          </tr>
+        </thead>
+        <tbody id="groupTableBody">
+          <!-- ข้อมูลคลิกแยกตามกลุ่ม -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ✅ แผนที่ -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold mb-4">🗺️ พิกัดผู้ใช้ที่คลิกลิงก์</h2>
+      <div id="map" class="h-96 rounded shadow border"></div>
+    </section>
+
+    <!-- ✅ กราฟ -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold mb-4">📈 กราฟเวลาการคลิก</h2>
+      <div class="mb-2">
+        <label for="chartMode" class="block text-sm font-medium mb-1">โหมดกราฟ</label>
+        <select id="chartMode" class="border px-3 py-1 rounded">
+          <option value="timeline">📅 Timeline</option>
+          <option value="group">🧩 Group</option>
+        </select>
+      </div>
+      <canvas id="clickChart" class="w-full max-w-full h-64"></canvas>
     </section>
   </div>
 
