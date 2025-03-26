@@ -1,42 +1,54 @@
-// ฟังก์ชันแปลง JSON เป็น CSV
-function jsonToCsv(jsonData) {
-    const header = Object.keys(jsonData[0]).join(',');
-    const rows = jsonData.map(row => Object.values(row).map(val => `"${val}"`).join(','));
-    return [header, ...rows].join('\r\n');
-}
-
-// ฟังก์ชัน export logs เฉพาะกลุ่มที่เลือก
-async function exportGroupLogs() {
-    const selectedGroup = document.getElementById('groupSelector').value;
-
-    // ดึงข้อมูล logs ทั้งหมดจาก API หรือไฟล์ที่เก็บข้อมูล (เช่น logs.json)
-    const response = await fetch('/api/logs'); // แก้ endpoint ให้ถูกต้องกับระบบคุณ
-    const logs = await response.json();
-
-    // กรองข้อมูลเฉพาะกลุ่มที่เลือก
-    const filteredLogs = logs.filter(log => log.group === selectedGroup);
-
-    // ตรวจสอบว่ามีข้อมูลหรือไม่
-    if (filteredLogs.length === 0) {
-        alert("ไม่มีข้อมูลสำหรับกลุ่มนี้");
+// ✅ โหลดลิงก์ทั้งหมดจาก backend และแสดงในหน้า Dashboard
+async function loadLinks() {
+    try {
+      const res = await fetch('/api/links');
+      const links = await res.json();
+  
+      const container = document.getElementById('linkList');
+      container.innerHTML = '';
+  
+      if (!links.length) {
+        container.innerHTML = '<p class="text-gray-500">ยังไม่มีลิงก์ในระบบ</p>';
         return;
+      }
+  
+      links.forEach((link, index) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded shadow';
+  
+        card.innerHTML = `
+          <p class="text-sm text-gray-600 mb-1">ลิงก์ #${index + 1}</p>
+          <p class="text-blue-600 break-all font-medium mb-2">${link.url}</p>
+          <div class="flex items-center space-x-2">
+            <button class="copyBtn bg-blue-500 text-white px-2 py-1 rounded text-sm" data-url="${link.url}">Copy</button>
+            <a href="${link.url}" target="_blank" class="text-sm text-green-600 underline">Open</a>
+          </div>
+        `;
+  
+        container.appendChild(card);
+      });
+  
+      // ✅ เชื่อมปุ่ม Copy ทุกรายการ
+      document.querySelectorAll('.copyBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const url = btn.getAttribute('data-url');
+          navigator.clipboard.writeText(url);
+          btn.textContent = 'Copied!';
+          setTimeout(() => (btn.textContent = 'Copy'), 1000);
+        });
+      });
+    } catch (error) {
+      console.error('Error loading links:', error);
     }
-
-    // แปลง JSON เป็น CSV
-    const csvData = jsonToCsv(filteredLogs);
-
-    // สร้าง Blob และลิงก์ดาวน์โหลด
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const downloadLink = document.createElement('a');
-    downloadLink.href = url;
-    downloadLink.download = `${selectedGroup}-logs.csv`;
-
-    // คลิกลิงก์อัตโนมัติแล้วลบลิงก์ออก
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-}
-
-// เชื่อมปุ่มกับฟังก์ชัน Export CSV
-document.getElementById('exportCsvBtn').addEventListener('click', exportGroupLogs);
+  }
+  
+  // ✅ เมื่อโหลดหน้าเว็บ
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLinks();
+    
+    // ✅ [เพิ่ม] เชื่อมปุ่ม Export Logs เป็น CSV
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      window.open('/api/export-logs', '_blank');
+    });
+  });
+  
