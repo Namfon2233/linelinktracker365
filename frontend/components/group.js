@@ -1,29 +1,33 @@
-import { renderClickChart } from './StatsChart.js';
+import { renderClickChart } from "./StatsChart.js";
 
 let logs = [];
 
 // ✅ [เพิ่ม] ฟังก์ชันแปลง JSON เป็น CSV
 function jsonToCsv(jsonData) {
-  const header = Object.keys(jsonData[0]).join(',');
-  const rows = jsonData.map(row => Object.values(row).map(val => `"${val}"`).join(','));
-  return [header, ...rows].join('\r\n');
+  const header = Object.keys(jsonData[0]).join(",");
+  const rows = jsonData.map((row) =>
+    Object.values(row)
+      .map((val) => `"${val}"`)
+      .join(","),
+  );
+  return [header, ...rows].join("\r\n");
 }
 
 // ✅ [เพิ่ม] ฟังก์ชัน export logs เฉพาะกลุ่ม + วันที่ที่เลือก
 async function exportGroupLogs() {
-  const selectedGroup = document.getElementById('groupSelector').value;
-  const startDate = document.getElementById('startDate').value;
-  const endDate = document.getElementById('endDate').value;
+  const selectedGroup = document.getElementById("groupSelector").value;
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
 
   if (!startDate || !endDate) {
     alert("⛔ กรุณาเลือกวันที่เริ่มต้นและสิ้นสุด");
     return;
   }
 
-  const response = await fetch('/api/logs');
+  const response = await fetch("/api/logs");
   const allLogs = await response.json();
 
-  const filteredLogs = allLogs.filter(log => {
+  const filteredLogs = allLogs.filter((log) => {
     const groupMatch = !selectedGroup || log.group === selectedGroup;
     const logDate = new Date(log.timestamp).toISOString().split("T")[0];
     const dateMatch = logDate >= startDate && logDate <= endDate;
@@ -36,11 +40,11 @@ async function exportGroupLogs() {
   }
 
   const csvData = jsonToCsv(filteredLogs);
-  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
-  const downloadLink = document.createElement('a');
+  const downloadLink = document.createElement("a");
   downloadLink.href = url;
-  downloadLink.download = `${selectedGroup || 'all'}-logs-${startDate}_to_${endDate}.csv`;
+  downloadLink.download = `${selectedGroup || "all"}-logs-${startDate}_to_${endDate}.csv`;
 
   document.body.appendChild(downloadLink);
   downloadLink.click();
@@ -49,7 +53,7 @@ async function exportGroupLogs() {
 
 // โหลด logs จาก backend
 async function fetchLogs() {
-  const res = await fetch('/data/logs.json');
+  const res = await fetch("/data/logs.json");
   const data = await res.json();
   logs = data;
   return data;
@@ -57,13 +61,13 @@ async function fetchLogs() {
 
 function renderGroupTable(filteredLogs = logs) {
   const groupClicks = {};
-  filteredLogs.forEach(log => {
-    const group = log.group || 'unknown';
+  filteredLogs.forEach((log) => {
+    const group = log.group || "unknown";
     groupClicks[group] = (groupClicks[group] || 0) + 1;
   });
 
-  const table = document.getElementById('groupTableBody');
-  table.innerHTML = '';
+  const table = document.getElementById("groupTableBody");
+  table.innerHTML = "";
 
   Object.entries(groupClicks).forEach(([group, count], index) => {
     const row = `
@@ -78,8 +82,8 @@ function renderGroupTable(filteredLogs = logs) {
 }
 
 function setupChartModeSelector() {
-  const chartModeSelector = document.getElementById('chartMode');
-  chartModeSelector.addEventListener('change', () => {
+  const chartModeSelector = document.getElementById("chartMode");
+  chartModeSelector.addEventListener("change", () => {
     const mode = chartModeSelector.value;
     renderClickChart(logs, mode);
   });
@@ -87,15 +91,15 @@ function setupChartModeSelector() {
 
 // ✅ [อัปเดต] เพิ่ม Tooltip บนแผนที่
 function renderMap(logs) {
-  const mapContainer = document.getElementById('map');
-  mapContainer.innerHTML = '';
-  const map = L.map('map').setView([13.736717, 100.523186], 6);
+  const mapContainer = document.getElementById("map");
+  mapContainer.innerHTML = "";
+  const map = L.map("map").setView([13.736717, 100.523186], 6);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 
-  logs.forEach(log => {
+  logs.forEach((log) => {
     const lat = parseFloat(log.latitude || log.lat);
     const lon = parseFloat(log.longitude || log.lon);
     if (!isNaN(lat) && !isNaN(lon)) {
@@ -103,29 +107,29 @@ function renderMap(logs) {
 
       const popupContent = `
         <div class="text-sm leading-snug">
-          <div><strong>👥 กลุ่ม:</strong> ${log.group || 'unknown'}</div>
-          <div><strong>🌐 IP:</strong> ${log.ip || '-'}</div>
-          <div><strong>📍 พิกัด:</strong> ${log.city || '-'}, ${log.country || '-'}</div>
+          <div><strong>👥 กลุ่ม:</strong> ${log.group || "unknown"}</div>
+          <div><strong>🌐 IP:</strong> ${log.ip || "-"}</div>
+          <div><strong>📍 พิกัด:</strong> ${log.city || "-"}, ${log.country || "-"}</div>
           <div><strong>🕒 เวลา:</strong> ${new Date(log.timestamp).toLocaleString()}</div>
-          <div><strong>📱 อุปกรณ์:</strong> ${log.device?.device || '-'} (${log.device?.os || '-'})</div>
-          <div><strong>🔎 เบราว์เซอร์:</strong> ${log.device?.browser || '-'}</div>
+          <div><strong>📱 อุปกรณ์:</strong> ${log.device?.device || "-"} (${log.device?.os || "-"})</div>
+          <div><strong>🔎 เบราว์เซอร์:</strong> ${log.device?.browser || "-"}</div>
         </div>
       `;
 
       marker.bindPopup(popupContent, {
-        className: 'custom-popup'
+        className: "custom-popup",
       });
     }
   });
 }
 
 function populateGroupSelector(logs) {
-  const groupSelector = document.getElementById('groupSelector');
-  const groups = new Set(logs.map(log => log.group || 'unknown'));
+  const groupSelector = document.getElementById("groupSelector");
+  const groups = new Set(logs.map((log) => log.group || "unknown"));
 
   groupSelector.innerHTML = `<option value="">🔽 All Groups</option>`;
-  groups.forEach(group => {
-    const option = document.createElement('option');
+  groups.forEach((group) => {
+    const option = document.createElement("option");
     option.value = group;
     option.textContent = group;
     groupSelector.appendChild(option);
@@ -134,12 +138,12 @@ function populateGroupSelector(logs) {
 
 function filterLogsByGroup(logs, group) {
   if (!group) return logs;
-  return logs.filter(log => log.group === group);
+  return logs.filter((log) => log.group === group);
 }
 
 // ✅ [เพิ่ม] ฟังก์ชันแสดง Date Picker
 function renderDateFilters() {
-  const dateControls = document.getElementById('dateFilterControls');
+  const dateControls = document.getElementById("dateFilterControls");
   if (!dateControls) return;
 
   dateControls.innerHTML = `
@@ -160,47 +164,53 @@ function renderDateFilters() {
 }
 
 // ✅ รันเมื่อโหลดหน้าเว็บ
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   await fetchLogs();
   populateGroupSelector(logs);
   renderDateFilters(); // ✅ เรียกฟังก์ชันแสดง Date Picker
   renderGroupTable();
   setupChartModeSelector();
-  renderClickChart(logs, 'timeline');
+  renderClickChart(logs, "timeline");
   renderMap(logs);
 
-  document.getElementById('groupSelector').addEventListener('change', () => {
-    const group = document.getElementById('groupSelector').value;
+  document.getElementById("groupSelector").addEventListener("change", () => {
+    const group = document.getElementById("groupSelector").value;
     const filteredLogs = filterLogsByGroup(logs, group);
-    renderClickChart(filteredLogs, document.getElementById('chartMode').value);
+    renderClickChart(filteredLogs, document.getElementById("chartMode").value);
     renderMap(filteredLogs);
     renderGroupTable(filteredLogs);
   });
 
   // ✅ เชื่อมปุ่ม Export CSV กับฟังก์ชันใหม่
-  document.addEventListener('click', e => {
-    if (e.target.id === 'exportCsvBtn') {
+  document.addEventListener("click", (e) => {
+    if (e.target.id === "exportCsvBtn") {
       exportGroupLogs();
     }
   });
 });
 
-// 🌙 Dark Mode Toggle (ล่าสุด)
-document.addEventListener('DOMContentLoaded', () => {
-  const darkToggle = document.getElementById('dark-mode-toggle');
+// ✅ [เพิ่มใหม่] ฟังก์ชันเปิด/ปิด Dark Mode พร้อมจำสถานะ
+function setupDarkModeToggle() {
+  const darkToggle = document.getElementById("dark-mode-toggle");
   const htmlElement = document.documentElement;
 
-  // ดึงค่า Dark Mode จาก localStorage
-  if (localStorage.getItem('dark-mode') === 'true') {
-    htmlElement.classList.add('dark');
-    if(darkToggle) darkToggle.checked = true;
+  // ถ้ามีค่าใน localStorage แล้ว → ตั้งค่าเริ่มต้น
+  const isDark = localStorage.getItem("dark-mode") === "true";
+  if (isDark) {
+    htmlElement.classList.add("dark");
+    if (darkToggle) darkToggle.checked = true;
   }
 
-  // ป้องกัน Error หากไม่มีปุ่ม Dark Mode
-  if(darkToggle) {
-    darkToggle.addEventListener('change', () => {
-      htmlElement.classList.toggle('dark', darkToggle.checked);
-      localStorage.setItem('dark-mode', darkToggle.checked);
+  // เมื่อมีการสลับ toggle
+  if (darkToggle) {
+    darkToggle.addEventListener("change", () => {
+      htmlElement.classList.toggle("dark", darkToggle.checked);
+      localStorage.setItem("dark-mode", darkToggle.checked);
     });
   }
+}
+
+// ✅ [เพิ่มใหม่] เรียกใช้งาน Dark Mode Toggle เมื่อโหลดหน้า
+document.addEventListener("DOMContentLoaded", () => {
+  setupDarkModeToggle();
 });
