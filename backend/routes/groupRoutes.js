@@ -7,6 +7,7 @@ const GROUPS_PATH = path.resolve(__dirname, '../../data/groups.json');
 const LOGS_PATH = path.resolve(__dirname, '../../data/logs.json');
 const STATE_PATH = path.resolve(__dirname, '../../data/state.json');
 
+// 🪵 Debug Log
 console.log("📁 GROUPS_PATH = ", GROUPS_PATH);
 console.log('📦 File exists? = ', fs.existsSync(GROUPS_PATH));
 console.log("📄 File content = ", fs.readFileSync(GROUPS_PATH, "utf8"));
@@ -17,13 +18,13 @@ function loadGroups() {
   return JSON.parse(fs.readFileSync(GROUPS_PATH));
 }
 
-// 🧠 โหลดตำแหน่งล่าสุด
+// 🧠 โหลดตำแหน่งล่าสุดของการสลับลิงก์ (round-robin)
 function loadState() {
   if (!fs.existsSync(STATE_PATH)) return {};
   return JSON.parse(fs.readFileSync(STATE_PATH));
 }
 
-// 💾 บันทึกตำแหน่ง
+// 💾 บันทึกตำแหน่ง index ล่าสุด
 function saveState(state) {
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
 }
@@ -39,21 +40,17 @@ function saveLogs(logs) {
   fs.writeFileSync(LOGS_PATH, JSON.stringify(logs, null, 2));
 }
 
-// ✅ Round-robin redirect
-console.log("✅ Full GROUPS_PATH:", GROUPS_PATH);
-console.log("✅ File exists:", fs.existsSync(GROUPS_PATH));
-console.log("✅ Raw file content:", fs.readFileSync(GROUPS_PATH, "utf8"));
+// ✅ Round-robin redirect: เปลี่ยนลิงก์ทุกครั้งที่คลิก
 router.get("/click/:groupId", (req, res) => {
   const groupId = req.params.groupId;
   const groups = loadGroups();
-  console.log("Loaded groups:", groups); // 👈 เพิ่มบรรทัดนี้
-
   const state = loadState();
   const logs = loadLogs();
 
-  const links = groups[groupId]; // ✅ แก้ตรงนี้
-  console.log("Requested group:", groupId); // 👈 เพิ่มบรรทัดนี้
-  console.log("Links in group:", links); // 👈 เพิ่มบรรทัดนี้
+  console.log("✅ Requested group:", groupId);
+  console.log("🔁 Group data:", groups[groupId]);
+
+  const links = groups[groupId]; // ลิงก์ทั้งหมดในกลุ่มนั้น
 
   if (!links || links.length === 0) {
     return res.status(404).send("Group not found or empty");
@@ -70,9 +67,16 @@ router.get("/click/:groupId", (req, res) => {
   const userAgent = req.headers["user-agent"];
   const timestamp = new Date().toISOString();
 
-  logs.push({ group: groupId, url: selectedUrl, ip, userAgent, timestamp });
+  logs.push({
+    group: groupId,
+    url: selectedUrl,
+    ip,
+    userAgent,
+    timestamp,
+  });
   saveLogs(logs);
 
+  // 🔀 Redirect ไปยังลิงก์ที่ถูกเลือก
   res.redirect(selectedUrl);
 });
 

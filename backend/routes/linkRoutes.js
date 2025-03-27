@@ -30,8 +30,39 @@ function saveLogs(data) {
   fs.writeFileSync(LOGS_PATH, JSON.stringify(data, null, 2));
 }
 
+// ✅ GET ลิงก์ทั้งหมด
+router.get('/', (req, res) => {
+  const links = loadLinks();
+  res.json(links);
+});
+
+// ✅ POST เพิ่มลิงก์ใหม่
+router.post('/', (req, res) => {
+  const links = loadLinks();
+  const newLink = {
+    id: Date.now().toString(),
+    url: req.body.url,
+    title: req.body.title || `Link ${links.length + 1}`,
+    group: req.body.group || 'default'
+  };
+  links.push(newLink);
+  saveLinks(links);
+  res.status(201).json(newLink);
+});
+
+// ✅ DELETE ลิงก์ตาม id
+router.delete('/:id', (req, res) => {
+  const links = loadLinks();
+  const filtered = links.filter(l => l.id !== req.params.id);
+  if (filtered.length === links.length) {
+    return res.status(404).json({ error: 'Link not found' });
+  }
+  saveLinks(filtered);
+  res.json({ message: 'ลบลิงก์แล้ว' });
+});
+
 // ✅ Redirect พร้อมบันทึก log
-router.get('/click/:id', async (req, res) => {
+router.get('/click/:id', (req, res) => {
   const links = loadLinks();
   const logs = loadLogs();
   const link = links.find(l => l.id === req.params.id);
@@ -45,6 +76,7 @@ router.get('/click/:id', async (req, res) => {
   logs.push({
     id: link.id,
     title: link.title,
+    group: link.group || 'default',
     ip,
     userAgent,
     timestamp
