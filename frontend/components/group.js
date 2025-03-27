@@ -214,3 +214,20 @@ function setupDarkModeToggle() {
 document.addEventListener("DOMContentLoaded", () => {
   setupDarkModeToggle();
 });
+
+// ✅ [เพิ่มใหม่] Re-render chart เมื่อ toggle Dark Mode
+function watchDarkModeChange() {
+  const darkToggle = document.getElementById("dark-mode-toggle");
+  if (!darkToggle) return;
+
+  darkToggle.addEventListener("change", () => {
+    const mode = document.getElementById("chartMode").value;
+    renderClickChart(logs, mode);
+  });
+}
+
+// ✅ [เพิ่มใหม่] เรียกใช้งาน Dark Mode Toggle และ Watch
+document.addEventListener("DOMContentLoaded", () => {
+  setupDarkModeToggle();
+  watchDarkModeChange();
+});
