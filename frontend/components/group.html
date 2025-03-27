@@ -1,21 +1,28 @@
 <!doctype html>
 <html lang="en" class="">
   <head>
+    <!-- 🌐 Metadata -->
     <meta charset="UTF-8" />
     <title>Group Dashboard | LINE Link Tracker</title>
+
+    <!-- 🎨 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 📊 Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Leaflet CSS -->
+    <!-- 🗺️ Leaflet Map CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
   </head>
+
   <body
-    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6"
+    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6 transition-colors duration-300"
   >
     <div class="max-w-6xl mx-auto">
+      <!-- 🔰 Header + Dark Mode Toggle -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">📊 Group Dashboard</h1>
 
@@ -31,17 +38,18 @@
           </div>
           <span
             class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >Dark Mode</span
           >
+            Dark Mode
+          </span>
         </label>
       </div>
 
-      <!-- 🎯 Group Selector + Export CSV -->
+      <!-- 🎯 ตัวเลือกกลุ่ม + Export CSV -->
       <div class="mb-6 flex items-end">
         <div class="flex-1">
-          <label for="groupSelector" class="block text-sm font-medium mb-1"
-            >Filter by Group</label
-          >
+          <label for="groupSelector" class="block text-sm font-medium mb-1">
+            Filter by Group
+          </label>
           <select
             id="groupSelector"
             class="border rounded p-2 w-full bg-white dark:bg-gray-800"
@@ -57,11 +65,11 @@
         </button>
       </div>
 
-      <!-- 📈 Chart Type Selector -->
+      <!-- 📈 ตัวเลือกโหมดกราฟ -->
       <div class="mb-6">
-        <label for="chartMode" class="block text-sm font-medium mb-1"
-          >Chart Type</label
-        >
+        <label for="chartMode" class="block text-sm font-medium mb-1">
+          Chart Type
+        </label>
         <select
           id="chartMode"
           class="border rounded p-2 bg-white dark:bg-gray-800"
@@ -71,7 +79,7 @@
         </select>
       </div>
 
-      <!-- 📊 Group Click Table -->
+      <!-- 📊 ตารางจำนวนคลิกตามกลุ่ม -->
       <section class="mb-10">
         <h2 class="text-xl font-bold mb-3">📊 ยอดคลิกแยกตามกลุ่ม</h2>
         <table
@@ -88,13 +96,13 @@
         </table>
       </section>
 
-      <!-- 📈 Chart Section -->
+      <!-- 📈 ส่วนแสดงกราฟ -->
       <div class="mb-10" id="chartSection">
         <h2 class="text-xl font-semibold mb-2">📈 Click Statistics</h2>
         <canvas id="clickChart" height="100"></canvas>
       </div>
 
-      <!-- 🗺️ Map Section -->
+      <!-- 🗺️ แผนที่พิกัดการคลิก -->
       <div id="mapSection" class="mb-10">
         <h2 class="text-xl font-semibold mb-2">🗺️ Click Locations</h2>
         <div
@@ -103,7 +111,7 @@
         ></div>
       </div>
 
-      <!-- 🧮 Clicks by URL -->
+      <!-- 🧮 ตารางคลิกตาม URL -->
       <div id="clickTableContainer" class="mb-10 hidden">
         <h2 class="text-xl font-semibold mb-2">🧮 Clicks by URL</h2>
         <table
@@ -121,16 +129,8 @@
       </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- 🔗 Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module" src="components/group.js"></script>
-
-    <!-- ✅ Dark Mode Toggle Script -->
-    <script>
-      const toggle = document.getElementById("dark-mode-toggle");
-      toggle.addEventListener("change", () => {
-        document.documentElement.classList.toggle("dark", toggle.checked);
-      });
-    </script>
   </body>
 </html>
