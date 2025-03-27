@@ -1,8 +1,11 @@
 {
-    "promo01": [
-      "https://line.me/R/ti/p/~@796yqkyf",
-      "https://line.me/R/ti/p/~@327ohtev",
-      "https://line.me/R/ti/p/~@379gbvod"
-    ]
-  }
-  
+  "promo01": [
+    "https://line.me/R/ti/p/~@796yqkyf",
+    "https://line.me/R/ti/p/~@327ohtev",
+    "https://line.me/R/ti/p/~@379gbvod"
+  ],
+  "promo02": [
+    "https://line.me/R/ti/p/~@example1",
+    "https://line.me/R/ti/p/~@example2"
+  ]
+}

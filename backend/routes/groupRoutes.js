@@ -1,16 +1,15 @@
+// backend/routes/groupRoutes.js
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const useragent = require("ua-parser-js");
+
 const router = express.Router();
 
-const GROUPS_PATH = path.resolve(__dirname, '../../data/groups.json');
-const LOGS_PATH = path.resolve(__dirname, '../../data/logs.json');
-const STATE_PATH = path.resolve(__dirname, '../../data/state.json');
-
-// 🪵 Debug Log
-console.log("📁 GROUPS_PATH = ", GROUPS_PATH);
-console.log('📦 File exists? = ', fs.existsSync(GROUPS_PATH));
-console.log("📄 File content = ", fs.readFileSync(GROUPS_PATH, "utf8"));
+const GROUPS_PATH = path.resolve(__dirname, "../../data/groups.json");
+const LOGS_PATH = path.resolve(__dirname, "../../data/logs.json");
+const STATE_PATH = path.resolve(__dirname, "../../data/state.json");
 
 // 🔁 โหลด group
 function loadGroups() {
@@ -18,13 +17,13 @@ function loadGroups() {
   return JSON.parse(fs.readFileSync(GROUPS_PATH));
 }
 
-// 🧠 โหลดตำแหน่งล่าสุดของการสลับลิงก์ (round-robin)
+// 🧠 โหลดตำแหน่งล่าสุด
 function loadState() {
   if (!fs.existsSync(STATE_PATH)) return {};
   return JSON.parse(fs.readFileSync(STATE_PATH));
 }
 
-// 💾 บันทึกตำแหน่ง index ล่าสุด
+// 💾 บันทึกตำแหน่ง
 function saveState(state) {
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
 }
@@ -40,18 +39,24 @@ function saveLogs(logs) {
   fs.writeFileSync(LOGS_PATH, JSON.stringify(logs, null, 2));
 }
 
-// ✅ Round-robin redirect: เปลี่ยนลิงก์ทุกครั้งที่คลิก
+// 📦 แปลง User-Agent เป็นข้อมูลอุปกรณ์
+function parseUserAgent(uaString) {
+  const parsed = useragent(uaString);
+  return {
+    os: parsed.os.name || "Unknown",
+    browser: parsed.browser.name || "Unknown",
+    device: parsed.device.model || "Desktop"
+  };
+}
+
+// ✅ Round-robin redirect พร้อมเก็บข้อมูลครบถ้วน
 router.get("/click/:groupId", (req, res) => {
   const groupId = req.params.groupId;
   const groups = loadGroups();
   const state = loadState();
   const logs = loadLogs();
 
-  console.log("✅ Requested group:", groupId);
-  console.log("🔁 Group data:", groups[groupId]);
-
-  const links = groups[groupId]; // ลิงก์ทั้งหมดในกลุ่มนั้น
-
+  const links = groups[groupId];
   if (!links || links.length === 0) {
     return res.status(404).send("Group not found or empty");
   }
@@ -66,17 +71,26 @@ router.get("/click/:groupId", (req, res) => {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const userAgent = req.headers["user-agent"];
   const timestamp = new Date().toISOString();
+  const device = parseUserAgent(userAgent);
 
-  logs.push({
+  const logEntry = {
     group: groupId,
     url: selectedUrl,
     ip,
     userAgent,
     timestamp,
-  });
+    location: {
+      city: req.headers["x-vercel-ip-city"] || "-",
+      country: req.headers["x-vercel-ip-country"] || "-"
+    },
+    device,
+    trackingCode: uuidv4(),
+    confirmed: false
+  };
+
+  logs.push(logEntry);
   saveLogs(logs);
 
-  // 🔀 Redirect ไปยังลิงก์ที่ถูกเลือก
   res.redirect(selectedUrl);
 });
 
