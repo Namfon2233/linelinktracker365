@@ -26,7 +26,7 @@
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">📊 Group Dashboard</h1>
 
-        <!-- 🌙 ปุ่ม Dark Mode Toggle -->
+        <!-- 🌙 ปุ่ม Toggle Dark Mode -->
         <label class="inline-flex items-center cursor-pointer">
           <input type="checkbox" id="dark-mode-toggle" class="sr-only peer" />
           <div
@@ -44,92 +44,101 @@
         </label>
       </div>
 
-      <!-- 🎯 ตัวเลือกกลุ่ม + Export CSV -->
-      <div class="mb-6 flex items-end">
-        <div class="flex-1">
-          <label for="groupSelector" class="block text-sm font-medium mb-1">
-            Filter by Group
-          </label>
-          <select
-            id="groupSelector"
-            class="border rounded p-2 w-full bg-white dark:bg-gray-800"
-          >
-            <option value="">🔽 All Groups</option>
-          </select>
-        </div>
-        <button
-          id="exportCsvBtn"
-          class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded ml-2"
-        >
-          📤 Export Logs เป็น CSV
-        </button>
-      </div>
-
-      <!-- 📈 ตัวเลือกโหมดกราฟ -->
+      <!-- 🎯 ตัวเลือกกลุ่ม + วันที่ + Export CSV -->
       <div class="mb-6">
-        <label for="chartMode" class="block text-sm font-medium mb-1">
-          Chart Type
-        </label>
-        <select
-          id="chartMode"
-          class="border rounded p-2 bg-white dark:bg-gray-800"
-        >
-          <option value="timeline">Click Timeline</option>
-          <option value="perDay">Clicks per Day</option>
-        </select>
+        <div class="flex flex-wrap gap-4 mb-4">
+          <div>
+            <label for="groupSelector" class="block text-sm font-medium">
+              🧩 เลือกกลุ่ม
+            </label>
+            <select
+              id="groupSelector"
+              class="border px-3 py-1 rounded w-full bg-white dark:bg-gray-800"
+            >
+              <option value="">🔽 All Groups</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">📅 Start Date</label>
+            <input
+              type="date"
+              id="startDate"
+              class="border rounded px-3 py-1 bg-white dark:bg-gray-800"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">📅 End Date</label>
+            <input
+              type="date"
+              id="endDate"
+              class="border rounded px-3 py-1 bg-white dark:bg-gray-800"
+            />
+          </div>
+          <div class="flex items-end">
+            <button
+              id="exportCsvBtn"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            >
+              📤 Export Logs เป็น CSV
+            </button>
+          </div>
+        </div>
       </div>
 
-      <!-- 📊 ตารางจำนวนคลิกตามกลุ่ม -->
+      <!-- 🔗 รายการลิงก์ทั้งหมด -->
       <section class="mb-10">
-        <h2 class="text-xl font-bold mb-3">📊 ยอดคลิกแยกตามกลุ่ม</h2>
+        <h2 class="text-xl font-semibold mb-4">🔗 รายการลิงก์ทั้งหมด</h2>
+        <div id="linkList" class="grid gap-4">
+          <!-- ลิงก์จะแสดงที่นี่ -->
+        </div>
+      </section>
+
+      <!-- 📊 ตารางคลิกตามกลุ่ม -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">📊 จำนวนคลิกแยกตามกลุ่ม</h2>
         <table
-          class="w-full bg-white dark:bg-gray-800 shadow rounded overflow-hidden"
+          class="w-full table-auto border bg-white dark:bg-gray-800 text-sm"
         >
-          <thead class="bg-gray-100 dark:bg-gray-700 text-left">
+          <thead class="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th class="py-2 px-4">#</th>
-              <th class="py-2 px-4">Group</th>
-              <th class="py-2 px-4 text-center">Total Clicks</th>
+              <th class="px-4 py-2 text-left">#</th>
+              <th class="px-4 py-2 text-left">Group</th>
+              <th class="px-4 py-2 text-center">Clicks</th>
             </tr>
           </thead>
           <tbody id="groupTableBody"></tbody>
         </table>
       </section>
 
-      <!-- 📈 ส่วนแสดงกราฟ -->
-      <div class="mb-10" id="chartSection">
-        <h2 class="text-xl font-semibold mb-2">📈 Click Statistics</h2>
-        <canvas id="clickChart" height="100"></canvas>
-      </div>
-
-      <!-- 🗺️ แผนที่พิกัดการคลิก -->
-      <div id="mapSection" class="mb-10">
-        <h2 class="text-xl font-semibold mb-2">🗺️ Click Locations</h2>
+      <!-- 🗺️ แผนที่ -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">🗺️ พิกัดผู้ใช้ที่คลิกลิงก์</h2>
         <div
           id="map"
-          class="w-full h-96 bg-gray-200 dark:bg-gray-800 rounded shadow"
+          class="h-96 rounded shadow border bg-gray-200 dark:bg-gray-800"
         ></div>
-      </div>
+      </section>
 
-      <!-- 🧮 ตารางคลิกตาม URL -->
-      <div id="clickTableContainer" class="mb-10 hidden">
-        <h2 class="text-xl font-semibold mb-2">🧮 Clicks by URL</h2>
-        <table
-          class="min-w-full border bg-white dark:bg-gray-800 rounded shadow-md"
-        >
-          <thead class="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th class="border p-2 text-left">#</th>
-              <th class="border p-2 text-left">URL</th>
-              <th class="border p-2 text-left">Total Clicks</th>
-            </tr>
-          </thead>
-          <tbody id="clickTableBody"></tbody>
-        </table>
-      </div>
+      <!-- 📈 กราฟเวลาการคลิก -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">📈 กราฟเวลาการคลิก</h2>
+        <div class="mb-2">
+          <label for="chartMode" class="block text-sm font-medium mb-1">
+            โหมดกราฟ
+          </label>
+          <select
+            id="chartMode"
+            class="border px-3 py-1 rounded bg-white dark:bg-gray-800"
+          >
+            <option value="timeline">📅 Timeline</option>
+            <option value="group">🧩 Group</option>
+          </select>
+        </div>
+        <canvas id="clickChart" class="w-full max-w-full h-64"></canvas>
+      </section>
     </div>
 
-    <!-- 🔗 Scripts -->
+    <!-- 🔗 Script Load -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module" src="components/group.js"></script>
   </body>
