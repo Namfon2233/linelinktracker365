@@ -26,6 +26,12 @@ export function renderClickChart(logs, mode = 'timeline') {
     window.chartInstance.destroy();
   }
 
+  // ✅ ตรวจโหมดมืดจาก <html class="dark">
+  const isDark = document.documentElement.classList.contains('dark');
+  const textColor = isDark ? '#f9fafb' : '#1f2937';
+  const gridColor = isDark ? '#374151' : '#e5e7eb';
+  const bgColor = isDark ? '#1e293b' : '#ffffff';
+
   // 📊 สร้างกราฟใหม่
   window.chartInstance = new Chart(ctx, {
     type: 'line',
@@ -34,6 +40,8 @@ export function renderClickChart(logs, mode = 'timeline') {
       datasets: [{
         label: mode === 'perDay' ? 'Clicks per Day' : 'Click Timeline',
         data,
+        borderColor: '#3b82f6',
+        backgroundColor: isDark ? 'rgba(59,130,246,0.2)' : 'rgba(59,130,246,0.1)',
         borderWidth: 2,
         tension: 0.3,
         fill: true,
@@ -43,21 +51,42 @@ export function renderClickChart(logs, mode = 'timeline') {
     options: {
       responsive: true,
       plugins: {
-        legend: { display: false },
+        legend: {
+          display: false,
+          labels: {
+            color: textColor
+          }
+        },
         title: {
           display: true,
-          text: mode === 'perDay' ? '📊 Clicks Per Day' : '📈 Click Timeline'
+          text: mode === 'perDay' ? '📊 Clicks Per Day' : '📈 Click Timeline',
+          color: textColor
+        },
+        tooltip: {
+          bodyColor: textColor,
+          titleColor: textColor,
+          backgroundColor: isDark ? '#334155' : '#f9fafb',
         }
       },
       scales: {
         x: {
           ticks: {
             maxRotation: 60,
-            minRotation: 30
+            minRotation: 30,
+            color: textColor
+          },
+          grid: {
+            color: gridColor
           }
         },
         y: {
-          beginAtZero: true
+          beginAtZero: true,
+          ticks: {
+            color: textColor
+          },
+          grid: {
+            color: gridColor
+          }
         }
       }
     }

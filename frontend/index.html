@@ -1,89 +1,142 @@
-<!-- frontend/index.html -->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>LINE Link Tracker Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 p-6">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6">📋 LINE Link Tracker Dashboard</h1>
+<html lang="en" class="">
+  <head>
+    <!-- 🌐 Metadata -->
+    <meta charset="UTF-8" />
+    <title>LINE Link Tracker Dashboard</title>
 
-    <!-- ✅ กรองตามกลุ่ม + วันที่ -->
-    <div class="mb-6">
-      <div class="flex flex-wrap gap-4 mb-4">
-        <div>
-          <label for="groupSelector" class="block text-sm font-medium">🧩 เลือกกลุ่ม</label>
-          <select id="groupSelector" class="border px-3 py-1 rounded w-full">
-            <option value="">🔽 All Groups</option>
-            <!-- group options จะแสดงที่นี่ -->
+    <!-- 🎨 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 🗺️ Leaflet CSS + JS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  </head>
+
+  <body
+    class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6 transition-colors duration-300"
+  >
+    <div class="max-w-4xl mx-auto">
+      <!-- 🔰 Header + ปุ่ม Toggle -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">📋 LINE Link Tracker Dashboard</h1>
+
+        <!-- 🌙 ปุ่ม Toggle Dark Mode -->
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="dark-mode-toggle" class="sr-only peer" />
+          <div
+            class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600 transition-colors duration-300"
+          >
+            <span
+              class="absolute top-1 left-1 bg-white w-4 h-4 rounded-full shadow transform peer-checked:translate-x-full peer-checked:bg-gray-300 transition-transform duration-300"
+            ></span>
+          </div>
+          <span
+            class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+          >
+            Dark Mode
+          </span>
+        </label>
+      </div>
+
+      <!-- 🎯 ตัวกรองกลุ่ม + วันที่ + Export -->
+      <div class="mb-6">
+        <div class="flex flex-wrap gap-4 mb-4">
+          <div>
+            <label for="groupSelector" class="block text-sm font-medium">
+              🧩 เลือกกลุ่ม
+            </label>
+            <select
+              id="groupSelector"
+              class="border px-3 py-1 rounded w-full bg-white dark:bg-gray-800"
+            >
+              <option value="">🔽 All Groups</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">📅 Start Date</label>
+            <input
+              type="date"
+              id="startDate"
+              class="border rounded px-3 py-1 bg-white dark:bg-gray-800"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">📅 End Date</label>
+            <input
+              type="date"
+              id="endDate"
+              class="border rounded px-3 py-1 bg-white dark:bg-gray-800"
+            />
+          </div>
+          <div class="flex items-end">
+            <button
+              id="exportCsvBtn"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            >
+              📤 Export Logs เป็น CSV
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔗 รายการลิงก์ทั้งหมด -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">🔗 รายการลิงก์ทั้งหมด</h2>
+        <div id="linkList" class="grid gap-4">
+          <!-- ลิงก์จะแสดงที่นี่ -->
+        </div>
+      </section>
+
+      <!-- 📊 ตารางคลิกตามกลุ่ม -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">📊 จำนวนคลิกแยกตามกลุ่ม</h2>
+        <table
+          class="w-full table-auto border bg-white dark:bg-gray-800 text-sm"
+        >
+          <thead class="bg-gray-200 dark:bg-gray-700">
+            <tr>
+              <th class="px-4 py-2 text-left">#</th>
+              <th class="px-4 py-2 text-left">Group</th>
+              <th class="px-4 py-2 text-center">Clicks</th>
+            </tr>
+          </thead>
+          <tbody id="groupTableBody"></tbody>
+        </table>
+      </section>
+
+      <!-- 🗺️ แผนที่ -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">🗺️ พิกัดผู้ใช้ที่คลิกลิงก์</h2>
+        <div
+          id="map"
+          class="h-96 rounded shadow border bg-gray-200 dark:bg-gray-800"
+        ></div>
+      </section>
+
+      <!-- 📈 กราฟเวลาการคลิก -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">📈 กราฟเวลาการคลิก</h2>
+        <div class="mb-2">
+          <label for="chartMode" class="block text-sm font-medium mb-1">
+            โหมดกราฟ
+          </label>
+          <select
+            id="chartMode"
+            class="border px-3 py-1 rounded bg-white dark:bg-gray-800"
+          >
+            <option value="timeline">📅 Timeline</option>
+            <option value="group">🧩 Group</option>
           </select>
         </div>
-        <div>
-          <label class="block text-sm font-medium">📅 Start Date</label>
-          <input type="date" id="startDate" class="border rounded px-3 py-1" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium">📅 End Date</label>
-          <input type="date" id="endDate" class="border rounded px-3 py-1" />
-        </div>
-        <div class="flex items-end">
-          <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-            📤 Export Logs เป็น CSV
-          </button>
-        </div>
-      </div>
+        <canvas id="clickChart" class="w-full max-w-full h-64"></canvas>
+      </section>
     </div>
 
-    <!-- ✅ ส่วนแสดงลิงก์ทั้งหมด -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold mb-4">🔗 รายการลิงก์ทั้งหมด</h2>
-      <div id="linkList" class="grid gap-4">
-        <!-- ลิงก์จะแสดงที่นี่ -->
-      </div>
-    </section>
-
-    <!-- ✅ ตารางคลิกตามกลุ่ม -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold mb-4">📊 จำนวนคลิกแยกตามกลุ่ม</h2>
-      <table class="w-full table-auto border">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="px-4 py-2 text-left">#</th>
-            <th class="px-4 py-2 text-left">Group</th>
-            <th class="px-4 py-2 text-center">Clicks</th>
-          </tr>
-        </thead>
-        <tbody id="groupTableBody">
-          <!-- ข้อมูลคลิกแยกตามกลุ่ม -->
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ✅ แผนที่ -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold mb-4">🗺️ พิกัดผู้ใช้ที่คลิกลิงก์</h2>
-      <div id="map" class="h-96 rounded shadow border"></div>
-    </section>
-
-    <!-- ✅ กราฟ -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold mb-4">📈 กราฟเวลาการคลิก</h2>
-      <div class="mb-2">
-        <label for="chartMode" class="block text-sm font-medium mb-1">โหมดกราฟ</label>
-        <select id="chartMode" class="border px-3 py-1 rounded">
-          <option value="timeline">📅 Timeline</option>
-          <option value="group">🧩 Group</option>
-        </select>
-      </div>
-      <canvas id="clickChart" class="w-full max-w-full h-64"></canvas>
-    </section>
-  </div>
-
-  <!-- ✅ Script -->
-  <script type="module" src="app.js"></script>
-</body>
+    <!-- 📦 Script Load -->
+    <script type="module" src="app.js"></script>
+  </body>
 </html>
